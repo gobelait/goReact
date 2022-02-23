@@ -1,6 +1,5 @@
-import axios from 'axios'
 import React, { useState } from 'react'
-import { Button, Form, Input, Modal } from 'semantic-ui-react'
+import { Button, Form, Modal } from 'semantic-ui-react'
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface taskType {
@@ -10,45 +9,18 @@ interface taskType {
 
 interface FormValues {
     propTask : taskType,
-    onUpdate: () => void;
+    onUpdate: (p: taskType) => void;
 }
-
-let endpoint = "http://localhost:9000";
 
 
 function ModalExampleModal( {propTask = {_id : 11, task : "test"}, onUpdate}: FormValues ) {
     const [open, setOpen] = useState(false)
     const { register, handleSubmit } = useForm<taskType>();    
     const onSubmit: SubmitHandler<taskType> = data => {
-        console.log("new task : " + data.task)
         propTask.task = data.task
-        updateTask(propTask)
-        onUpdate()
+        onUpdate(propTask)
         setOpen(false);
     } 
-    console.log("task name : " + propTask.task)
-
-
-    function updateTask(paramTask: any) {
-
-        console.log("item dans update : " + JSON.stringify(paramTask.task) )
-        let newTask = {
-            ID: paramTask._id,
-            task: paramTask.task,
-            status: paramTask.status,
-        }
-
-        axios.put(endpoint + "/api/task/" + newTask.ID, newTask, {
-            headers: {
-                "Content-Type":"application/x-www-form-urlencoded",
-            },
-        } ).then((res)=>{
-            console.log(res);
-            // informer TodoList du changement pour proc getTask()
-        }).catch(error => {
-            console.error('There was an error!', error);
-        });
-    }
     
     return (
       <Modal 

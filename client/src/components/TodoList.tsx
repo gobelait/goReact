@@ -114,9 +114,29 @@ class TodoList extends Component<PropsType, StateType> {
     }
 
 
-    handleUpdate() {
-        console.log("todolist update ")
-        this.getTask();
+    handleUpdate(newTask: any) {
+        this.updateTask(newTask)
+    }
+
+    updateTask(paramTask: any) {
+
+        console.log("item dans update : " + JSON.stringify(paramTask.task) )
+        let newTask = {
+            ID: paramTask._id,
+            task: paramTask.task,
+            status: paramTask.status,
+        }
+
+        axios.put(endpoint + "/api/task/" + newTask.ID, newTask, {
+            headers: {
+                "Content-Type":"application/x-www-form-urlencoded",
+            },
+        } ).then((res)=>{
+            console.log(res);
+            this.getTask();
+        }).catch(error => {
+            console.error('There was an error!', error);
+        });
     }
 
     componentDidMount() {
