@@ -2,6 +2,7 @@ import React, {ChangeEvent, Component, CSSProperties, ReactNode} from "react";
 import axios from "axios";
 import {Header, Form, Icon, Input, Card} from "semantic-ui-react";
 import { SemanticCOLORS } from "semantic-ui-react/dist/commonjs/generic";
+import TaskModal from "./TaskModal"
 
 
 let endpoint = "http://localhost:9000";
@@ -27,9 +28,9 @@ class TodoList extends Component<PropsType, StateType> {
             errorMessage: "",
         };
         
-
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
 
 
@@ -72,23 +73,23 @@ class TodoList extends Component<PropsType, StateType> {
                             style = {
                                 ...style, textDecorationLine: "line-through",
                             }
-                            style["textDecorationLine"] = "line-through";
                         } else {
                             coloring ='red';
                             style = {
                                 ...style, textDecorationLine: "none",
                             }
-                            style["textDecorationLine"] = "none";
                         }
                         return (
                             <Card key={item._id} color={coloring} fluid className="rough">
                                 {/* TODO : passer le card.header en input quand dblClick */}
-                                <Card.Content onDoubleClick={() => this.updateTask(item)}>
+                                <Card.Content>
                                     <Card.Header textAlign="left">
                                         <div style={style}>{item.task}</div>
                                     </Card.Header>
 
                                     <Card.Meta textAlign="right">
+
+                                    <TaskModal propTask={item} onUpdate={this.handleUpdate} ></TaskModal>
 
                                         {/* changement du bouton en fonction de l'etat */}
                                         {iconUndoRedo} 
@@ -110,6 +111,12 @@ class TodoList extends Component<PropsType, StateType> {
                 });
             }
         });
+    }
+
+
+    handleUpdate() {
+        console.log("todolist update ")
+        this.getTask();
     }
 
     componentDidMount() {
@@ -141,28 +148,6 @@ class TodoList extends Component<PropsType, StateType> {
         });
     }
 
-    updateTask(task: any) {
-
-        // TODO: recuperer info (task) et faire passer dans la requete PUT
-        console.log("item dans update : " + task.task )
-        let newTask = {
-            ID: task.id,
-            task: "UPDATED",
-            status: task.status,
-        }
-
-        axios.put(endpoint + "/api/task/" + newTask, {
-            headers: {
-                "Content-Type":"application/x-www-form-urlencoded",
-            },
-        } ).then((res)=>{
-            console.log(res);
-            this.getTask();
-        }).catch(error => {
-            this.setState({ errorMessage: error.message });
-            console.error('There was an error!', error);
-        });
-    }
 
     undoTask= (id: number) => {
         axios.put(endpoint + "/api/undoTask/" + id, {

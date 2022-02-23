@@ -43,11 +43,20 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	// trouver un moyen de passer les infos dans le r.Body
 	var updatedTask models.TodoList
-	json.NewDecoder(r.Body).Decode(&updatedTask)
-	updateTask(updatedTask)
-	fmt.Println("task decoded : ", updatedTask)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&updatedTask); err != nil {
+		log.Fatal("erreur decode Body : ", w)
+	}
+	defer r.Body.Close()
 
-	json.NewEncoder(w).Encode(updatedTask)
+	param_id := mux.Vars(r)["id"]
+	id, err := primitive.ObjectIDFromHex(param_id)
+	if err != nil {
+		log.Fatal("erreur transformation ObjectID", err, id)
+	}
+	updatedTask.ID = id
+	updateTask(updatedTask)
+
 }
 
 func UndoTask(w http.ResponseWriter, r *http.Request) {
@@ -118,10 +127,10 @@ func getAllTasks() []primitive.M {
 	return results
 }
 
-func updateTask(task models.TodoList) {
-	fmt.Println("update : ", task.Task)
-	filter := bson.M{"_id": task.ID}
-	update := bson.M{"$set": bson.M{"task": task.Task}}
+func updateTask(taskUpdate models.TodoList) {
+	fmt.Println("update : ", taskUpdate.Task)
+	filter := bson.M{"_id": taskUpdate.ID}
+	update := bson.M{"$set": bson.M{"task": taskUpdate.Task}}
 	result, err := db.GetMongoDBCollection().UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Fatal(err)
