@@ -4,7 +4,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 interface taskType {
     _id: number, 
-    task: string
+    task: string,
+    status: boolean
 }
 
 interface FormValues {
@@ -13,7 +14,7 @@ interface FormValues {
 }
 
 
-function ModalExampleModal( {propTask = {_id : 11, task : "test"}, onUpdate}: FormValues ) {
+function ModalExampleModal( {propTask = {_id : 0, task : "default", status: true}, onUpdate}: FormValues ) {
     const [open, setOpen] = useState(false)
     const { register, handleSubmit } = useForm<taskType>();    
     const onSubmit: SubmitHandler<taskType> = data => {

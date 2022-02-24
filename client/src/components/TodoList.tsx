@@ -118,11 +118,11 @@ class TodoList extends Component<{}, StateType> {
     }
 
 
-    handleUpdate(newTask: any) {
+    handleUpdate(newTask: TaskType) {
         this.updateTask(newTask)
     }
 
-    updateTask(paramTask: any) {
+    updateTask(paramTask: TaskType) {
 
         console.log("item dans update : " + JSON.stringify(paramTask.task) )
         let newTask = {
