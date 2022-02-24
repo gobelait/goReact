@@ -9,7 +9,7 @@ function App() {
   return (
     <div>
        <Container>
-         <TodoList prop={undefined}></TodoList>
+         <TodoList/>
        </Container>
     </div>
   );

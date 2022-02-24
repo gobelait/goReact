@@ -5,9 +5,7 @@ import App from './App';
 //import reportWebVitals from './reportWebVitals.js'; import non fonctionnel -> fichier non trouvé
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+    <App />,
   document.getElementById('root')
 );
 

@@ -13,13 +13,17 @@ interface StateType {
     errorMessage: string;
 }
 
-interface PropsType {
-    prop: any
+interface TaskType {
+    _id: number,
+    task: string,
+    status: boolean
 }
 
-class TodoList extends Component<PropsType, StateType> {
 
-    constructor(props: PropsType) {
+
+class TodoList extends Component<{}, StateType> {
+
+    constructor(props: never) {
         super(props);
 
         this.state = {
@@ -39,7 +43,7 @@ class TodoList extends Component<PropsType, StateType> {
         axios.get(endpoint + "/api/task").then((res)=>{
             if (res.data) {
                 this.setState({
-                    items : res.data.map((item: any) => {
+                    items : res.data.map((item: TaskType) => {
 
                         let isDone = item.status;
                         let iconUndoRedo;
