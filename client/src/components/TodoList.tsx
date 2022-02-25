@@ -1,19 +1,15 @@
-/* eslint-disable no-console */
 import React, {
   ChangeEvent, Component, CSSProperties, ReactNode,
 } from 'react';
 import axios from 'axios';
 import {
-  Header, Form, Icon, Input, Card,
-  SemanticCOLORS,
+  Header, Form, Icon, Input, Card, SemanticCOLORS,
 } from 'semantic-ui-react';
-import TaskModal from './TaskModal';
-import {
-  TaskType, endpoint,
-} from '../endpoints';
+import { TaskType, endpoint } from '../endpoints';
 import { redoTaskEndpoint, undoTaskEndpoint, updateTaskEndpoint } from '../endpoints/update';
 import { deleteAllTasksEndpoint, deleteTaskEndpoint } from '../endpoints/delete';
 import createTaskEndpoint from '../endpoints/create';
+import TodoItem from './TodoItems';
 
 interface StateType {
     task: string;
@@ -49,48 +45,6 @@ class TodoList extends Component<{}, StateType> {
       if (res.data) {
         this.setState({
           items: res.data.map((item: TaskType) => {
-            const isDone = item.status;
-            let iconUndoRedo;
-            if (!isDone) { // status : false
-              iconUndoRedo = (
-                <div>
-                  <Icon
-                    onClick={() => this.undoTask(item._id)}
-                    name="check circle"
-                    color="green"
-                  />
-                  <span
-                    onClick={() => this.undoTask(item._id)}
-                    onKeyPress={() => this.undoTask(item._id)}
-                    style={{ paddingRight: 10 }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    Done
-                  </span>
-                </div>
-              );
-            } else { // status : true
-              iconUndoRedo = (
-                <div>
-                  <Icon
-                    onClick={() => this.redoTask(item._id)}
-                    name="check circle outline"
-                    color="red"
-                  />
-                  <span
-                    onClick={() => this.redoTask(item._id)}
-                    onKeyPress={() => this.redoTask(item._id)}
-                    style={{ paddingRight: 10 }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    Undone
-                  </span>
-                </div>
-              );
-            }
-
             let coloring : SemanticCOLORS = 'yellow';
             let style: CSSProperties = {
               wordWrap: 'break-word',
@@ -107,36 +61,15 @@ class TodoList extends Component<{}, StateType> {
               };
             }
             return (
-              <Card key={item._id} color={coloring} fluid className="rough">
-                <Card.Content>
-                  <Card.Header textAlign="left">
-                    <div style={style}>{item.task}</div>
-                  </Card.Header>
-
-                  <Card.Meta textAlign="right">
-
-                    <TaskModal propTask={item} onUpdate={this.handleUpdate} />
-
-                    {/* changement du bouton en fonction de l'etat */}
-                    {iconUndoRedo}
-                    <Icon
-                      onClick={() => this.deleteTask(item._id)}
-                      name="delete"
-                      color="red"
-                    />
-                    <span
-                      onClick={() => this.deleteTask(item._id)}
-                      onKeyPress={() => this.deleteTask(item._id)}
-                      style={{ paddingRight: 10 }}
-                      role="button"
-                      tabIndex={0}
-                    >
-                      Delete
-                    </span>
-
-                  </Card.Meta>
-                </Card.Content>
-              </Card>
+              <TodoItem
+                item={item}
+                coloring={coloring}
+                style={style}
+                undoTask={this.undoTask}
+                redoTask={this.redoTask}
+                handleUpdate={this.handleUpdate}
+                deleteTask={this.deleteTask}
+              />
             );
           }),
         });
@@ -230,7 +163,7 @@ class TodoList extends Component<{}, StateType> {
         </div>
       );
     } else {
-      divError = <div />;
+      divError = <div className="error" />;
     }
 
     const { task } = this.state;

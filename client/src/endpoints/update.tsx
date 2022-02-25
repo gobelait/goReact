@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import axios from 'axios';
 import { contentType, endpoint, TaskType } from '.';
 
@@ -21,7 +20,6 @@ export async function redoTaskEndpoint(id: number) {
 }
 
 export async function updateTaskEndpoint(paramTask: TaskType) {
-  console.log(`item dans update : ${JSON.stringify(paramTask.task)}`);
   const newTask = {
     ID: paramTask._id,
     task: paramTask.task,
