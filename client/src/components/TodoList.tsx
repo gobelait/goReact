@@ -9,9 +9,11 @@ import {
 } from 'semantic-ui-react';
 import TaskModal from './TaskModal';
 import {
-  TaskType, endpoint, contentType,
+  TaskType, endpoint,
 } from '../endpoints';
 import { redoTaskEndpoint, undoTaskEndpoint, updateTaskEndpoint } from '../endpoints/update';
+import { deleteAllTasksEndpoint, deleteTaskEndpoint } from '../endpoints/delete';
+import createTaskEndpoint from '../endpoints/create';
 
 interface StateType {
     task: string;
@@ -146,26 +148,17 @@ class TodoList extends Component<{}, StateType> {
     });
   };
 
-  onSubmit = () => { // creation d'une tache
+  onSubmit = async () => { // creation d'une tache
     const { task } = this.state;
-
     if (task) {
-      axios.post(
-        `${endpoint}/api/task`,
-        { task },
-        {
-          headers: {
-            'Content-Type': contentType,
-          },
-        },
-      ).then((res) => {
-        this.getTask();
-        this.setState({
-          task: '',
-        });
-        console.log(res);
+      const done = await createTaskEndpoint(task);
+      this.getTask();
+      this.setState({
+        task: '',
       });
+      return done;
     }
+    return task;
   };
 
   onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -177,14 +170,12 @@ class TodoList extends Component<{}, StateType> {
   undoTask = async (id: number) => {
     const done = await undoTaskEndpoint(id);
     this.getTask();
-    console.log('getTask undo fini : ', done);
     return done;
   };
 
   redoTask = async (id: number) => {
     const done = await redoTaskEndpoint(id);
     this.getTask();
-    console.log('getTask redo fini', done);
     return done;
   };
 
@@ -194,27 +185,17 @@ class TodoList extends Component<{}, StateType> {
     return done;
   };
 
-  deleteTask(id: number) {
-    axios.delete(`${endpoint}/api/deleteTask/${id}`, {
-      headers: {
-        'Content-Type': contentType,
-      },
-    }).then((res) => {
-      console.log(res);
-      this.getTask();
-    });
-  }
+  deleteTask = async (id: number) => {
+    const done = await deleteTaskEndpoint(id);
+    this.getTask();
+    return done;
+  };
 
-  deleteAllTasks() {
-    axios.delete(`${endpoint}/api/deleteAllTasks`, {
-      headers: {
-        'Content-Type': contentType,
-      },
-    }).then((res) => {
-      console.log(res);
-      this.getTask();
-    });
-  }
+  deleteAllTasks = async () => {
+    const done = await deleteAllTasksEndpoint();
+    this.getTask();
+    return done;
+  };
 
   render(): ReactNode {
     const { items } = this.state;
