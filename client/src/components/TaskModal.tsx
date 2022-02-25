@@ -24,10 +24,20 @@ function ModalExampleModal({ propTask = { _id: 0, task: 'default', status: true 
     setOpen(false);
   };
 
+  // Cette fonction ne marche pas :(
+  function handleKeyDown(e: KeyboardEvent): void {
+    const code = e.key;
+    if (code === 'enter') {
+      e.preventDefault();
+      handleSubmit(onSubmit);
+    }
+  }
+
   return (
     <Modal
       as={Form}
       onSubmit={handleSubmit(onSubmit)}
+      onKeyDown={(e: KeyboardEvent) => handleKeyDown}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}

@@ -8,7 +8,10 @@ import {
   SemanticCOLORS,
 } from 'semantic-ui-react';
 import TaskModal from './TaskModal';
-import { TaskType, endpoint } from '../endpoints';
+import {
+  TaskType, endpoint, contentType,
+} from '../endpoints';
+import { redoTaskEndpoint, undoTaskEndpoint, updateTaskEndpoint } from '../endpoints/update';
 
 interface StateType {
     task: string;
@@ -103,7 +106,6 @@ class TodoList extends Component<{}, StateType> {
             }
             return (
               <Card key={item._id} color={coloring} fluid className="rough">
-                {/* TODO : passer le card.header en input quand dblClick */}
                 <Card.Content>
                   <Card.Header textAlign="left">
                     <div style={style}>{item.task}</div>
@@ -153,7 +155,7 @@ class TodoList extends Component<{}, StateType> {
         { task },
         {
           headers: {
-            'Content-Type': 'application/x-wwww-form-urlencoded',
+            'Content-Type': contentType,
           },
         },
       ).then((res) => {
@@ -172,52 +174,30 @@ class TodoList extends Component<{}, StateType> {
     });
   };
 
-  undoTask = (id: number) => {
-    axios.put(`${endpoint}/api/undoTask/${id}`, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then((res) => {
-      console.log(res);
-      this.getTask();
-    });
+  undoTask = async (id: number) => {
+    const done = await undoTaskEndpoint(id);
+    this.getTask();
+    console.log('getTask undo fini : ', done);
+    return done;
   };
 
-  redoTask = (id: number) => {
-    axios.put(`${endpoint}/api/redoTask/${id}`, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then((res) => {
-      console.log(res);
-      this.getTask();
-    });
+  redoTask = async (id: number) => {
+    const done = await redoTaskEndpoint(id);
+    this.getTask();
+    console.log('getTask redo fini', done);
+    return done;
   };
 
-  updateTask(paramTask: TaskType) {
-    console.log(`item dans update : ${JSON.stringify(paramTask.task)}`);
-    const newTask = {
-      ID: paramTask._id,
-      task: paramTask.task,
-      status: paramTask.status,
-    };
-
-    axios.put(`${endpoint}/api/task/${newTask.ID}`, newTask, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then((res) => {
-      console.log(res);
-      this.getTask();
-    }).catch((error) => {
-      console.error('There was an error!', error);
-    });
-  }
+  updateTask = async (paramTask: TaskType) => {
+    const done = await updateTaskEndpoint(paramTask);
+    this.getTask();
+    return done;
+  };
 
   deleteTask(id: number) {
     axios.delete(`${endpoint}/api/deleteTask/${id}`, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': contentType,
       },
     }).then((res) => {
       console.log(res);
@@ -228,7 +208,7 @@ class TodoList extends Component<{}, StateType> {
   deleteAllTasks() {
     axios.delete(`${endpoint}/api/deleteAllTasks`, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': contentType,
       },
     }).then((res) => {
       console.log(res);
